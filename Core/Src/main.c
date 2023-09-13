@@ -46,6 +46,7 @@ UART_HandleTypeDef huart2;
 
 int currentLEDColor = 0;
 int flashCounter = 0;
+int isPressed = 0;
 
 /* USER CODE END PV */
 
@@ -105,7 +106,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 	  //If check if button is pressed
-	  if(!HAL_GPIO_ReadPin(Button_Blue_GPIO_Port, Button_Blue_Pin)){
+	  if(isPressed){
 		  //Alternate between white and off on the LED
 		  if(flashCounter){
 			  flashCounter = 0;
@@ -234,11 +235,11 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, LED_Red_Pin|LED_Green_Pin|LED_Blue_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : Button_Blue_Pin */
-  GPIO_InitStruct.Pin = Button_Blue_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  /*Configure GPIO pin : PC13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(Button_Blue_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LD2_Pin */
   GPIO_InitStruct.Pin = LD2_Pin;
@@ -254,11 +255,31 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  //User Button Interrupt
+  if(GPIO_Pin == GPIO_PIN_13) {
+	  if(!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13)){//Falling Edge
+		  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+		  isPressed = 1;
+	  }else{//Rising Edge
+		  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+		  isPressed = 0;
+	  }
+  } else {
+      __NOP();
+  }
+}
 
 //0 = Off, 1 = red, 2 = green, 3 = blue, 4 = white
 void setLEDColor(int color){
