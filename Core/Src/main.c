@@ -45,7 +45,6 @@ UART_HandleTypeDef huart2;
 /* USER CODE BEGIN PV */
 
 int currentLEDColor = 0;
-int isFlashing = 0;
 int flashCounter = 0;
 
 /* USER CODE END PV */
@@ -105,7 +104,9 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
+	  //If check if button is pressed
 	  if(!HAL_GPIO_ReadPin(Button_Blue_GPIO_Port, Button_Blue_Pin)){
+		  //Alternate between white and off on the LED
 		  if(flashCounter){
 			  flashCounter = 0;
 			  setLEDColor(4);
@@ -113,7 +114,9 @@ int main(void)
 			  flashCounter = 1;
 			  setLEDColor(0);
 		  }
-	  }else{
+	  }else{//If not pressed
+
+		  //Cycle the LED between red(1) green(2) blue(3)
 		  if(currentLEDColor > 2){
 			  currentLEDColor = 1;
 		  }else{
@@ -121,6 +124,7 @@ int main(void)
 		  }
 		  setLEDColor(currentLEDColor);
 	  }
+	  //Cyle every 250ms
 	  HAL_Delay(250);
 
   }
