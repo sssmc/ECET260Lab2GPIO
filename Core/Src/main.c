@@ -106,11 +106,6 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 	  if(!HAL_GPIO_ReadPin(Button_Blue_GPIO_Port, Button_Blue_Pin)){
-		  isFlashing = 1;
-	  }else{
-		  isFlashing = 0;
-	  }
-	  if(isFlashing){
 		  if(flashCounter){
 			  flashCounter = 0;
 			  setLEDColor(4);
