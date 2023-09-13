@@ -105,6 +105,28 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
+	  if(!HAL_GPIO_ReadPin(Button_Blue_GPIO_Port, Button_Blue_Pin)){
+		  isFlashing = 1;
+	  }else{
+		  isFlashing = 0;
+	  }
+	  if(isFlashing){
+		  if(flashCounter){
+			  flashCounter = 0;
+			  setLEDColor(4);
+		  }else{
+			  flashCounter = 1;
+			  setLEDColor(0);
+		  }
+	  }else{
+		  if(currentLEDColor > 2){
+			  currentLEDColor = 1;
+		  }else{
+			  currentLEDColor++;
+		  }
+		  setLEDColor(currentLEDColor);
+	  }
+	  HAL_Delay(250);
 
   }
   /* USER CODE END 3 */
@@ -241,7 +263,7 @@ static void MX_GPIO_Init(void)
 
 //0 = Off, 1 = red, 2 = green, 3 = blue, 4 = white
 void setLEDColor(int color){
-	switch(currentLEDColor){
+	switch(color){
 		case 0:
 		  HAL_GPIO_WritePin(LED_Red_GPIO_Port, LED_Red_Pin, GPIO_PIN_RESET);
 		  HAL_GPIO_WritePin(LED_Green_GPIO_Port, LED_Green_Pin, GPIO_PIN_RESET);
